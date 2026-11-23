@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#11130f">
+    <meta name="description" content="Нурбек — AI-архитектура и Python. Локальные GGUF-модели, нейросетевые workflow и инженерия ИИ.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Нурбек — AI-инженерия и Python">
+    <meta property="og:description" content="Архитектура ИИ, локальные GGUF-модели и инженерия нейросетевых workflow.">
+    <meta property="og:url" content="https://tipinopgopinok-ctrl.github.io/">
+    <title>Нурбек — AI-инженерия и Python</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #e8e8dc;
+        --muted: #9c9f91;
+        --dim: #686d60;
+        --paper: #11130f;
+        --line: #30352b;
+        --acid: #c8f169;
+        --orange: #e98d60;
+        --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      *, *::before, *::after { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: radial-gradient(ellipse at 86% 13%, rgb(200 241 105 / 6%), transparent 26rem), var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 16px;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; }
+      a:focus-visible { outline: 2px solid var(--acid); outline-offset: 5px; }
+      .skip-link {
+        position: absolute; top: 0; left: 1rem; z-index: 5; padding: .6rem 1rem;
+        transform: translateY(-150%); background: var(--acid); color: var(--paper);
+      }
+      .skip-link:focus { transform: translateY(0); }
+      .shell { width: min(1120px, calc(100% - 48px)); margin-inline: auto; }
+      .topbar {
+        display: flex; align-items: center; justify-content: space-between;
+        min-height: 82px; border-bottom: 1px solid var(--line);
+      }
+      .wordmark {
+        display: inline-flex; align-items: center; gap: 11px; color: var(--ink);
+        font: 13px var(--mono); letter-spacing: .04em; text-decoration: none;
+      }
+      .wordmark-mark {
+        display: grid; width: 31px; height: 31px; place-items: center;
+        border: 1px solid var(--acid); color: var(--acid); font-size: 12px;
+      }
+      .nav { display: flex; align-items: center; gap: 30px; }
+      .nav a {
+        color: var(--muted); font: 11px var(--mono); text-decoration: none;
+        transition: color .18s ease;
+      }
+      .nav a:hover, footer a:hover { color: var(--acid); }
+      .nav .nav-cta { color: var(--acid); }
+      .hero {
+        display: grid; min-height: 630px; align-items: center;
+        grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr);
+        gap: 54px; padding-block: 84px 104px;
+      }
+      .eyebrow, .section-kicker {
+        display: flex; align-items: center; gap: 10px; color: var(--acid);
+        font: 11px var(--mono); letter-spacing: .11em; text-transform: uppercase;
+      }
+      .eyebrow::before, .section-kicker::before { width: 22px; height: 1px; background: currentColor; content: ""; }
+      h1 {
+        max-width: 720px; margin: 24px 0 22px; font-size: clamp(3.4rem, 8.6vw, 7.4rem);
+        font-weight: 560; letter-spacing: -.085em; line-height: .96;
+      }
+      h1 span, .section-heading h2 span, .stack-intro h2 span, .contact h2 span { color: var(--acid); }
+      .hero-copy { max-width: 560px; margin: 0; color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.17rem); }
+      .hero-actions { display: flex; flex-wrap: wrap; gap: 13px; margin-top: 34px; }
+      .button {
+        display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 12px;
+        padding: 0 18px; border: 1px solid var(--line); font: 11px var(--mono);
+        text-decoration: none; transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+      }
+      .button:hover { transform: translateY(-2px); }
+      .button-primary { border-color: var(--acid); background: var(--acid); color: var(--paper); }
+      .button-primary:hover { border-color: #dbffa0; background: #dbffa0; }
+      .button-secondary { color: var(--ink); }
+      .button-secondary:hover { border-color: var(--muted); }
+      .button-arrow { font-size: 16px; }
+      .terminal {
+        position: relative; padding: 22px; border: 1px solid #3b4231;
+        background: linear-gradient(145deg, rgb(200 241 105 / 5%), transparent 55%), #151811;
+        box-shadow: 0 24px 90px rgb(0 0 0 / 24%); transform: rotate(1.5deg);
+      }
+      .terminal::after {
+        position: absolute; right: -7px; bottom: -7px; z-index: -1;
+        width: 100%; height: 100%; border: 1px solid #383d2d; content: "";
+      }
+      .terminal-bar {
+        display: flex; justify-content: space-between; padding-bottom: 18px;
+        border-bottom: 1px solid var(--line); color: var(--dim); font: 10px var(--mono);
+      }
+      .terminal-dots { display: flex; gap: 5px; }
+      .terminal-dots i { width: 6px; height: 6px; border-radius: 50%; background: #58604b; }
+      .terminal-body { padding: 23px 0 7px; font: 12px/2.1 var(--mono); }
+      .terminal-comment { color: #777e6b; }
+      .terminal-line { color: #e0e5d5; }
+      .terminal-key { color: var(--acid); }
+      .terminal-value { color: var(--orange); }
+      .terminal-cursor {
+        display: inline-block; width: 7px; height: 14px; margin-left: 4px;
+        background: var(--acid); vertical-align: -3px; animation: blink 1.1s steps(2, start) infinite;
+      }
+      @keyframes blink { to { visibility: hidden; } }
+      .status-row { display: flex; align-items: center; gap: 9px; margin-top: 18px; color: var(--muted); font: 10px var(--mono); }
+      .status-light { width: 7px; height: 7px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 12px rgb(200 241 105 / 55%); }
+      .ticker { overflow: hidden; border-block: 1px solid var(--line); background: #151811; }
+      .ticker-inner {
+        display: flex; justify-content: space-between; gap: 28px; padding-block: 17px;
+        color: var(--muted); font: 10px var(--mono); letter-spacing: .08em; text-transform: uppercase;
+      }
+      .ticker-inner span { white-space: nowrap; }
+      .ticker-inner b { margin-right: 9px; color: var(--acid); font-weight: 400; }
+      section.content-section { padding-block: 112px; }
+      .section-heading { display: grid; grid-template-columns: .7fr 1.3fr; gap: 40px; align-items: start; margin-bottom: 46px; }
+      .section-heading h2 {
+        max-width: 660px; margin: 0; font-size: clamp(2.2rem, 5vw, 4rem);
+        font-weight: 520; letter-spacing: -.06em; line-height: 1.05;
+      }
+      .section-heading p { max-width: 640px; margin: 18px 0 0; color: var(--muted); }
+      .principles { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); }
+      .principle { min-height: 235px; padding: 26px; }
+      .principle + .principle { border-left: 1px solid var(--line); }
+      .principle-number { color: var(--acid); font: 11px var(--mono); }
+      .principle h3 { margin: 34px 0 10px; font-size: 19px; font-weight: 520; letter-spacing: -.03em; }
+      .principle p { margin: 0; color: var(--muted); font-size: 14px; }
+      .work-section { border-block: 1px solid var(--line); background: #151811; }
+      .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .work-card {
+        display: flex; min-height: 252px; flex-direction: column; justify-content: space-between;
+        padding: 27px; border: 1px solid var(--line); background: var(--paper);
+        text-decoration: none; transition: border-color .2s ease, transform .2s ease;
+      }
+      .work-card:hover { transform: translateY(-3px); border-color: var(--acid); }
+      .work-top { display: flex; align-items: center; justify-content: space-between; color: var(--dim); font: 10px var(--mono); }
+      .work-index, .work-icon { color: var(--acid); }
+      .work-icon { font-size: 20px; }
+      .work-card h3 { margin: 35px 0 7px; font-size: 24px; font-weight: 520; letter-spacing: -.04em; }
+      .work-card p { max-width: 440px; margin: 0; color: var(--muted); font-size: 14px; }
+      .work-link { margin-top: 22px; color: var(--acid); font: 10px var(--mono); }
+      .stack-layout { display: grid; grid-template-columns: .85fr 1.15fr; gap: 80px; align-items: start; }
+      .stack-intro h2 { margin: 16px 0; font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 520; letter-spacing: -.065em; line-height: 1; }
+      .stack-intro p { margin: 0; color: var(--muted); }
+      .stack-list { border-top: 1px solid var(--line); }
+      .stack-item { display: grid; grid-template-columns: 44px 1fr auto; gap: 15px; align-items: center; padding: 19px 0; border-bottom: 1px solid var(--line); }
+      .stack-index { color: var(--dim); font: 10px var(--mono); }
+      .stack-item strong { display: block; font-size: 15px; font-weight: 520; }
+      .stack-item small { color: var(--muted); font-size: 12px; }
+      .stack-tag { padding: 5px 8px; border: 1px solid var(--line); color: var(--muted); font: 9px var(--mono); white-space: nowrap; }
+      .contact {
+        display: flex; align-items: end; justify-content: space-between; gap: 40px; padding: 52px;
+        border: 1px solid #3b4231;
+        background: radial-gradient(ellipse at 90% 90%, rgb(200 241 105 / 9%), transparent 45%), #171a13;
+      }
+      .contact h2 { max-width: 610px; margin: 14px 0 12px; font-size: clamp(2.5rem, 5.5vw, 5rem); font-weight: 520; letter-spacing: -.075em; line-height: .98; }
+      .contact p { max-width: 460px; margin: 0; color: var(--muted); }
+      .contact-action { flex: 0 0 auto; }
+      footer { display: flex; justify-content: space-between; gap: 24px; padding-block: 26px; color: var(--dim); font: 10px var(--mono); }
+      footer a { color: var(--muted); text-decoration: none; }
+      @media (max-width: 760px) {
+        .shell { width: min(100% - 36px, 560px); }
+        .topbar { min-height: 70px; }
+        .nav { gap: 16px; }
+        .nav a { font-size: 10px; }
+        .nav a:not(.nav-cta) { display: none; }
+        .hero { min-height: 0; grid-template-columns: 1fr; gap: 48px; padding-block: 83px 76px; }
+        h1 { font-size: clamp(3.5rem, 16vw, 6rem); }
+        .terminal { max-width: 440px; margin-inline: auto; transform: rotate(.7deg); }
+        .ticker-inner { justify-content: flex-start; overflow-x: auto; scrollbar-width: none; }
+        .ticker-inner::-webkit-scrollbar { display: none; }
+        section.content-section { padding-block: 78px; }
+        .section-heading, .stack-layout { grid-template-columns: 1fr; gap: 23px; }
+        .section-heading { margin-bottom: 30px; }
+        .section-heading p { margin-top: 13px; }
+        .principles { grid-template-columns: 1fr; }
+        .principle { min-height: auto; padding: 23px; }
+        .principle + .principle { border-top: 1px solid var(--line); border-left: 0; }
+        .principle h3 { margin-top: 20px; }
+        .work-grid { grid-template-columns: 1fr; }
+        .work-card { min-height: 220px; padding: 23px; }
+        .stack-layout { gap: 34px; }
+        .contact { align-items: flex-start; flex-direction: column; padding: 29px; }
+        footer { flex-direction: column; gap: 9px; }
+      }
+      @media (max-width: 400px) {
+        .shell { width: calc(100% - 30px); }
+        .wordmark { gap: 8px; font-size: 11px; }
+        .nav .nav-cta { font-size: 9px; }
+        .hero-actions { flex-direction: column; align-items: stretch; }
+        .button { width: 100%; }
+        .stack-item { grid-template-columns: 27px 1fr; }
+        .stack-tag { grid-column: 2; justify-self: start; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Перейти к содержимому</a>
+    <header class="shell topbar">
+      <a class="wordmark" href="#top" aria-label="Нурбек — на главную">
+        <span class="wordmark-mark" aria-hidden="true">N.</span>
+        <span>NURBEK / AI ENGINEERING</span>
+      </a>
+      <nav class="nav" aria-label="Основная навигация">
+        <a href="#about">Обо мне</a>
+        <a href="#work">Репозитории</a>
+        <a class="nav-cta" href="#contact">Связаться <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+    <main id="main">
+      <div class="shell hero" id="top">
+        <div>
+          <div class="eyebrow">AI architecture · Python</div>
+          <h1>Приручаю<br>сложность<br><span>ИИ.</span></h1>
+          <p class="hero-copy">Я Нурбек. Проектирую AI-системы и создаю инструменты на Python — с фокусом на локальные модели, понятную архитектуру и рабочие нейросетевые процессы.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#work">Смотреть проекты <span class="button-arrow" aria-hidden="true">↘</span></a>
+            <a class="button button-secondary" href="https://github.com/tipinopgopinok-ctrl" target="_blank" rel="noopener noreferrer">Открыть GitHub <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+        <aside class="terminal" aria-label="Технический профиль">
+          <div class="terminal-bar">
+            <span class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span>nurbek.profile</span><span>●</span>
+          </div>
+          <div class="terminal-body">
+            <div class="terminal-comment"># текущий фокус</div>
+            <div class="terminal-line"><span class="terminal-key">domain</span> = <span class="terminal-value">"AI systems"</span></div>
+            <div class="terminal-line"><span class="terminal-key">language</span> = <span class="terminal-value">"Python"</span></div>
+            <div class="terminal-line"><span class="terminal-key">models</span> = <span class="terminal-value">"local · GGUF"</span></div>
+            <div class="terminal-line"><span class="terminal-key">approach</span> = <span class="terminal-value">"build & iterate"</span></div>
+            <div class="terminal-line"><span class="terminal-key">hardware</span> = <span class="terminal-value">"RTX 3060"</span><span class="terminal-cursor" aria-hidden="true"></span></div>
+          </div>
+          <div class="status-row"><span class="status-light" aria-hidden="true"></span> СИСТЕМЫ ПРОЕКТИРУЮТСЯ ЛОКАЛЬНО</div>
+        </aside>
+      </div>
+      <div class="ticker" aria-label="Области работы">
+        <div class="shell ticker-inner">
+          <span><b>✳</b> AI architecture</span><span><b>✳</b> Python engineering</span>
+          <span><b>✳</b> GGUF / local inference</span><span><b>✳</b> Neural workflows</span>
+        </div>
+      </div>
+      <section class="shell content-section" id="about">
+        <div class="section-heading">
+          <div class="section-kicker">01 / Подход</div>
+          <div>
+            <h2>ИИ должен быть не магией, а <span>инженерией.</span></h2>
+            <p>Меня интересует весь путь от модели до полезного инструмента: как компоненты взаимодействуют, где система работает и как сделать её понятной для дальнейшего развития.</p>
+          </div>
+        </div>
+        <div class="principles">
+          <article class="principle">
+            <div class="principle-number">01 — ЛОКАЛЬНО</div>
+            <h3>Контроль над средой</h3>
+            <p>Исследую запуск GGUF-моделей на локальном оборудовании и подходы, которые дают больше контроля над AI-системой.</p>
+          </article>
+          <article class="principle">
+            <div class="principle-number">02 — СИСТЕМНО</div>
+            <h3>Архитектура прежде хаоса</h3>
+            <p>Разбираю задачу на понятные части и связываю инструменты в воспроизводимые нейросетевые workflow.</p>
+          </article>
+          <article class="principle">
+            <div class="principle-number">03 — ПРАКТИЧНО</div>
+            <h3>Python для реальных задач</h3>
+            <p>Строю вокруг AI-процессов программную основу, которую можно проверять, улучшать и использовать.</p>
+          </article>
+        </div>
+      </section>
+      <section class="work-section" id="work">
+        <div class="shell content-section">
+          <div class="section-heading">
+            <div class="section-kicker">02 / Код</div>
+            <div>
+              <h2>Исследуй мои <span>репозитории.</span></h2>
+              <p>Открытый код и эксперименты — на GitHub. Репозитории меняются по мере работы, поэтому здесь только прямые ссылки без неподтверждённых обещаний.</p>
+            </div>
+          </div>
+          <div class="work-grid">
+            <a class="work-card" href="https://github.com/tipinopgopinok-ctrl" target="_blank" rel="noopener noreferrer">
+              <div class="work-top"><span class="work-index">REPOSITORY / 01</span><span class="work-icon" aria-hidden="true">↗</span></div>
+              <div>
+                <h3>GitHub профиль</h3>
+                <p>Публичные репозитории и текущие разработки в области AI и Python.</p>
+                <div class="work-link">github.com/tipinopgopinok-ctrl</div>
+              </div>
+            </a>
+            <a class="work-card" href="https://github.com/tipinopgopinok-ctrl/entropy_core_dev" target="_blank" rel="noopener noreferrer">
+              <div class="work-top"><span class="work-index">REPOSITORY / 02</span><span class="work-icon" aria-hidden="true">↗</span></div>
+              <div>
+                <h3>entropy_core_dev</h3>
+                <p>Открыть репозиторий проекта и посмотреть исходный код.</p>
+                <div class="work-link">github.com/tipinopgopinok-ctrl/entropy_core_dev</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+      <section class="shell content-section">
+        <div class="stack-layout">
+          <div class="stack-intro">
+            <div class="section-kicker">03 / Инструменты</div>
+            <h2>Работаю ближе <span>к модели.</span></h2>
+            <p>Локальная AI-среда для экспериментов, инженерии и собственных workflow.</p>
+          </div>
+          <div class="stack-list">
+            <div class="stack-item"><span class="stack-index">01</span><div><strong>Python</strong><small>Язык для AI-инструментов и системной логики</small></div><span class="stack-tag">ENGINEERING</span></div>
+            <div class="stack-item"><span class="stack-index">02</span><div><strong>GGUF-модели</strong><small>Локальное взаимодействие с языковыми моделями</small></div><span class="stack-tag">LOCAL AI</span></div>
+            <div class="stack-item"><span class="stack-index">03</span><div><strong>NVIDIA RTX 3060</strong><small>Личная workstation для локальных экспериментов</small></div><span class="stack-tag">HARDWARE</span></div>
+            <div class="stack-item"><span class="stack-index">04</span><div><strong>Custom workflows</strong><small>Связанные процессы вокруг нейросетевых задач</small></div><span class="stack-tag">SYSTEMS</span></div>
+          </div>
+        </div>
+      </section>
+      <section class="shell content-section" id="contact">
+        <div class="contact">
+          <div>
+            <div class="section-kicker">04 / Контакт</div>
+            <h2>Есть идея для <span>AI?</span></h2>
+            <p>Открыт к обсуждению инженерных задач, локальных моделей и Python-проектов. Напиши мне через GitHub.</p>
+          </div>
+          <div class="contact-action">
+            <a class="button button-primary" href="https://github.com/tipinopgopinok-ctrl" target="_blank" rel="noopener noreferrer">Найти меня на GitHub <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="shell">
+      <span>© <span id="year">2026</span> NURBEK · BUILT WITH INTENTION</span>
+      <a href="#top">Наверх ↑</a>
+      <span>PYTHON · AI · LOCAL FIRST</span>
+    </footer>
+    <script>document.getElementById("year").textContent = String(new Date().getFullYear());</script>
+  </body>
+</html>
