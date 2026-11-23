@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru" data-product="metric">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f6f9">
+    <meta name="description" content="Демонстрационная панель аналитики бизнеса: ключевые показатели, динамика выручки и каналы.">
+    <title>Metric Desk — Аналитика бизнеса</title>
+    <link rel="stylesheet" href="../theme.css">
+    <style>:root { --accent: #265c9a; --accent-soft: #e8f0fa; }</style>
+  </head>
+  <body>
+    <div class="topbar-wrap">
+      <header class="frame topbar">
+        <a class="brand" href="./" aria-label="Metric Desk — главная">
+          <span class="brand-mark" aria-hidden="true">M</span><span><span class="brand-name">Metric Desk</span><span class="brand-caption">Аналитика бизнеса</span></span>
+        </a>
+        <div class="top-actions"><span class="demo-pill">Демонстрационные данные</span></div>
+      </header>
+      <nav class="frame app-nav" aria-label="Разделы продукта">
+        <a href="./" aria-current="page">Обзор</a><a href="#channels">Каналы</a><a href="#details">Показатели</a>
+      </nav>
+    </div>
+    <main class="frame main">
+      <div class="page-heading">
+        <div><p class="eyebrow">Рабочее пространство / Обзор</p><h1>Показатели бизнеса</h1><p class="subheading">Сводная картина динамики выручки и заказов за выбранный период.</p></div>
+        <div class="controls"><label class="sr-only" for="period">Период отчёта</label><select class="select" id="period"><option value="month">Последние 30 дней</option><option value="week">Последние 7 дней</option><option value="quarter">Последние 90 дней</option></select><button class="button" id="export" type="button">Экспорт отчёта</button></div>
+      </div>
+      <div class="notice"><span aria-hidden="true">ⓘ</span><span><strong>Демонстрационный интерфейс.</strong> Все цифры и графики на этой странице — вымышленные примеры, не реальные бизнес-данные.</span></div>
+      <section class="metric-grid" aria-label="Ключевые показатели">
+        <article class="card metric"><div class="metric-label">Выручка</div><div class="metric-value" data-metric="revenue">₽ 4,82 млн</div><div class="metric-foot"><span class="positive">↗ 12,4%</span><span>к предыдущему периоду</span></div></article>
+        <article class="card metric"><div class="metric-label">Заказы</div><div class="metric-value" data-metric="orders">1 284</div><div class="metric-foot"><span class="positive">↗ 8,2%</span><span>к предыдущему периоду</span></div></article>
+        <article class="card metric"><div class="metric-label">Средний чек</div><div class="metric-value" data-metric="average">₽ 3 754</div><div class="metric-foot"><span class="positive">↗ 3,9%</span><span>к предыдущему периоду</span></div></article>
+        <article class="card metric"><div class="metric-label">Конверсия</div><div class="metric-value" data-metric="conversion">3,62%</div><div class="metric-foot"><span class="negative">↘ 0,3 п.п.</span><span>к предыдущему периоду</span></div></article>
+      </section>
+      <div class="analytics-grid">
+        <section class="card">
+          <div class="card-heading"><div><h2>Динамика выручки</h2><small id="chart-period">Помесячная сводка за 30 дней</small></div><span class="legend">Выручка</span></div>
+          <div class="chart-area" id="chart" role="img" aria-label="Столбчатая диаграмма с демонстрационной выручкой">
+            <span class="chart-bar" style="height:34%" data-value="₽ 112 тыс."></span><span class="chart-bar" style="height:48%" data-value="₽ 158 тыс."></span><span class="chart-bar" style="height:41%" data-value="₽ 136 тыс."></span><span class="chart-bar" style="height:63%" data-value="₽ 207 тыс."></span><span class="chart-bar" style="height:52%" data-value="₽ 171 тыс."></span><span class="chart-bar" style="height:72%" data-value="₽ 237 тыс."></span><span class="chart-bar" style="height:58%" data-value="₽ 191 тыс."></span><span class="chart-bar" style="height:81%" data-value="₽ 267 тыс."></span><span class="chart-bar" style="height:65%" data-value="₽ 214 тыс."></span><span class="chart-bar" style="height:92%" data-value="₽ 303 тыс."></span><span class="chart-bar" style="height:76%" data-value="₽ 250 тыс."></span><span class="chart-bar" style="height:100%" data-value="₽ 329 тыс."></span>
+          </div>
+          <div class="chart-labels"><span>01</span><span>05</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
+        </section>
+        <section class="card" id="channels">
+          <div class="card-heading"><div><h2>Каналы продаж</h2><small>Доля демонстрационной выручки</small></div></div>
+          <div class="rank-list"><div class="rank-row"><span>Интернет-магазин</span><span>46%</span></div><div class="rank-row"><span>Партнёры</span><span>28%</span></div><div class="rank-row"><span>Прямые продажи</span><span>18%</span></div><div class="rank-row"><span>Другие каналы</span><span>8%</span></div></div>
+        </section>
+      </div>
+      <section class="card" id="details" style="margin-top:15px">
+        <div class="card-heading"><h2>Сводка по направлениям</h2><span class="label">Демо-данные</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Направление</th><th>Выручка</th><th>Заказы</th><th>Динамика</th><th>Статус</th></tr></thead><tbody><tr><td><strong>Онлайн</strong><span class="muted">Цифровой канал</span></td><td>₽ 2,22 млн</td><td>592</td><td class="positive">+14,2%</td><td><span class="tag tag-green">В плане</span></td></tr><tr><td><strong>Партнёрская сеть</strong><span class="muted">Косвенные продажи</span></td><td>₽ 1,35 млн</td><td>321</td><td class="positive">+8,7%</td><td><span class="tag tag-green">В плане</span></td></tr><tr><td><strong>Прямые продажи</strong><span class="muted">Коммерческая команда</span></td><td>₽ 868 тыс.</td><td>231</td><td class="negative">−2,1%</td><td><span class="tag tag-amber">Внимание</span></td></tr></tbody></table></div>
+      </section>
+    </main>
+    <footer class="frame footer"><span>Metric Desk · Концепт интерфейса</span><span>Демо-цифры не являются фактической отчётностью</span></footer>
+    <script>
+      const periods = {
+        week: { revenue: "₽ 1,14 млн", orders: "302", average: "₽ 3 775", conversion: "3,58%", label: "Помесячная сводка за 7 дней", bars: [38, 49, 45, 70, 53, 78, 64, 86, 73, 92, 82, 100] },
+        month: { revenue: "₽ 4,82 млн", orders: "1 284", average: "₽ 3 754", conversion: "3,62%", label: "Помесячная сводка за 30 дней", bars: [34, 48, 41, 63, 52, 72, 58, 81, 65, 92, 76, 100] },
+        quarter: { revenue: "₽ 13,6 млн", orders: "3 716", average: "₽ 3 660", conversion: "3,47%", label: "Помесячная сводка за 90 дней", bars: [40, 55, 47, 62, 51, 69, 61, 77, 66, 88, 79, 100] }
+      };
+      document.getElementById("period").addEventListener("change", (event) => {
+        const data = periods[event.target.value];
+        Object.entries(data).filter(([key]) => ["revenue", "orders", "average", "conversion"].includes(key)).forEach(([key, value]) => { document.querySelector(`[data-metric="${key}"]`).textContent = value; });
+        document.getElementById("chart-period").textContent = data.label;
+        document.querySelectorAll(".chart-bar").forEach((bar, index) => { bar.style.height = `${data.bars[index]}%`; });
+      });
+      document.getElementById("export").addEventListener("click", () => {
+        const rows = [["Показатель", "Демонстрационное значение"], ...Object.entries(periods[document.getElementById("period").value]).filter(([key]) => ["revenue", "orders", "average", "conversion"].includes(key))];
+        const csv = rows.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" }));
+        link.download = "metric-desk-demo.csv"; link.click(); URL.revokeObjectURL(link.href);
+      });
+    </script>
+  </body>
+</html>

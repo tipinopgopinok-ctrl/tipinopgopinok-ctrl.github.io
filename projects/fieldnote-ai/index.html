@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f6f9">
+    <meta name="description" content="Концепт базы знаний с семантическим поиском и ответами, связанными с источниками.">
+    <title>Fieldnote — База знаний</title>
+    <link rel="stylesheet" href="../theme.css">
+    <style>:root { --accent: #8a572b; --accent-soft: #f5ede5; }</style>
+  </head>
+  <body>
+    <div class="topbar-wrap">
+      <header class="frame topbar">
+        <a class="brand" href="./" aria-label="Fieldnote — главная">
+          <span class="brand-mark" aria-hidden="true">F</span><span><span class="brand-name">Fieldnote</span><span class="brand-caption">Поиск по базе знаний</span></span>
+        </a>
+        <div class="top-actions"><span class="demo-pill">Локальная демо-база</span></div>
+      </header>
+      <nav class="frame app-nav" aria-label="Разделы продукта">
+        <a href="./" aria-current="page">Поиск</a><a href="#library">Библиотека</a><a href="#how">Как это работает</a>
+      </nav>
+    </div>
+    <main class="frame main">
+      <div class="page-heading">
+        <div><p class="eyebrow">Знания / Рабочее пространство</p><h1>Найдите ответ в документации</h1><p class="subheading">Поиск по внутренним материалам с понятными ссылками на источники.</p></div>
+      </div>
+      <div class="notice"><span aria-hidden="true">ⓘ</span><span><strong>Демонстрационный поиск без AI-бэкенда.</strong> Запросы фильтруют локальные примеры документов в этом браузере; ответы и источники — концепт.</span></div>
+      <div class="knowledge-layout">
+        <section class="card">
+          <div class="search-hero">
+            <h2>Что вы хотите найти?</h2>
+            <form class="search-line" id="search-form">
+              <label class="sr-only" for="knowledge-search">Поиск по демонстрационной базе знаний</label>
+              <input class="search" id="knowledge-search" type="search" placeholder="Например: как согласовать закупку?">
+              <button class="button button-primary" type="submit">Найти</button>
+            </form>
+            <div class="result-count" id="result-count" aria-live="polite">4 материала в демонстрационной базе</div>
+          </div>
+          <div id="results" aria-live="polite">
+            <article class="result" data-terms="закупка поставщик согласование заявка бюджет запрос">
+              <h3>Процесс согласования закупки</h3>
+              <p>Перед оформлением заявки определите бюджет и владельца запроса. Для суммы выше установленного порога приложите обоснование и получите согласование ответственного руководителя.</p>
+              <div class="result-meta"><span class="tag">Операции</span><span>Демо-руководство · раздел 2</span><span>Обновлено: пример</span></div>
+            </article>
+            <article class="result" data-terms="доступ система учетная запись безопасность роль разрешение поддержка">
+              <h3>Запрос доступа к внутренней системе</h3>
+              <p>Опишите рабочую задачу, необходимую роль и срок доступа. Запрос проверяется владельцем системы; выдавайте только права, нужные для указанной задачи.</p>
+              <div class="result-meta"><span class="tag">ИТ-поддержка</span><span>Демо-инструкция · раздел 1</span><span>Обновлено: пример</span></div>
+            </article>
+            <article class="result" data-terms="отчет квартал показатели метрика аналитика обзор">
+              <h3>Подготовка квартального обзора</h3>
+              <p>Сверьте период и определения показателей, отметьте ограничения источников и добавьте владельца для каждого следующего шага.</p>
+              <div class="result-meta"><span class="tag">Аналитика</span><span>Демо-шаблон · раздел 3</span><span>Обновлено: пример</span></div>
+            </article>
+            <article class="result" data-terms="передача смены команда операция статус задача журнал">
+              <h3>Передача текущих задач между сменами</h3>
+              <p>Зафиксируйте состояние, нерешённые вопросы и ближайшее действие. Не включайте в журнал секреты, пароли или личные данные.</p>
+              <div class="result-meta"><span class="tag">Командные процессы</span><span>Демо-памятка · раздел 1</span><span>Обновлено: пример</span></div>
+            </article>
+            <div class="empty" id="empty" hidden>По этому запросу в демонстрационной базе ничего не найдено.</div>
+          </div>
+        </section>
+        <aside>
+          <section class="card side-card" id="library">
+            <h3>Популярные вопросы</h3>
+            <button class="suggestion" type="button" data-query="закупка">Как согласовать закупку?</button>
+            <button class="suggestion" type="button" data-query="доступ">Как запросить доступ?</button>
+            <button class="suggestion" type="button" data-query="отчет квартал">Что добавить в квартальный обзор?</button>
+            <button class="suggestion" type="button" data-query="передача смены">Как передать незавершённую задачу?</button>
+          </section>
+          <section class="card side-card" id="how">
+            <h3>Принцип работы</h3>
+            <p style="margin:0;color:#647084;font-size:11px">Ответы должны опираться на документы, показывать источники и честно сообщать, если в базе нет нужной информации.</p>
+          </section>
+        </aside>
+      </div>
+    </main>
+    <footer class="frame footer"><span>Fieldnote · Концепт базы знаний</span><span>Примеры материалов не являются корпоративной документацией</span></footer>
+    <script>
+      const input = document.getElementById("knowledge-search");
+      const results = [...document.querySelectorAll("[data-terms]")];
+      const empty = document.getElementById("empty");
+      function search() {
+        const query = input.value.trim().toLocaleLowerCase("ru").split(/\s+/).filter(Boolean);
+        let count = 0;
+        results.forEach((result) => {
+          const text = `${result.dataset.terms} ${result.textContent}`.toLocaleLowerCase("ru");
+          const matches = !query.length || query.some((term) => text.includes(term));
+          result.hidden = !matches;
+          if (matches) count += 1;
+        });
+        empty.hidden = count > 0;
+        document.getElementById("result-count").textContent = `${count} ${count === 1 ? "материал" : count > 1 && count < 5 ? "материала" : "материалов"} в демонстрационной базе`;
+      }
+      document.getElementById("search-form").addEventListener("submit", (event) => { event.preventDefault(); search(); });
+      input.addEventListener("input", search);
+      document.querySelectorAll("[data-query]").forEach((button) => button.addEventListener("click", () => { input.value = button.dataset.query; search(); input.focus(); }));
+    </script>
+  </body>
+</html>

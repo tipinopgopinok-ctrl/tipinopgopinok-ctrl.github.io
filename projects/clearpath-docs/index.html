@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f6f9">
+    <meta name="description" content="Демо-система документооборота для регистрации, согласования и контроля версий.">
+    <title>Clearpath Records — Документооборот</title>
+    <link rel="stylesheet" href="../theme.css">
+    <style>:root { --accent: #66518d; --accent-soft: #eeeaf6; }</style>
+  </head>
+  <body>
+    <div class="topbar-wrap">
+      <header class="frame topbar">
+        <a class="brand" href="./" aria-label="Clearpath Records — главная">
+          <span class="brand-mark" aria-hidden="true">C</span><span><span class="brand-name">Clearpath Records</span><span class="brand-caption">Документы и согласования</span></span>
+        </a>
+        <div class="top-actions"><span class="demo-pill">Демонстрационные данные</span></div>
+      </header>
+      <nav class="frame app-nav" aria-label="Разделы продукта">
+        <a href="./" aria-current="page">Документы</a><a href="#documents">На согласовании</a><a href="#documents">Архив</a>
+      </nav>
+    </div>
+    <main class="frame main">
+      <div class="page-heading">
+        <div><p class="eyebrow">Рабочее пространство / Реестр</p><h1>Реестр документов</h1><p class="subheading">Контроль статусов, ответственных и следующих шагов в цикле согласования.</p></div>
+        <button class="button button-primary" id="new-record" type="button">＋ Зарегистрировать</button>
+      </div>
+      <div class="notice"><span aria-hidden="true">ⓘ</span><span><strong>Демонстрационный интерфейс.</strong> Названия, даты и статусы ниже — примеры. Загружать документы и персональные данные здесь нельзя.</span></div>
+      <section class="metric-grid" aria-label="Сводка по документам">
+        <article class="card metric"><div class="metric-label">В реестре</div><div class="metric-value" data-count="all">4</div><div class="metric-foot">Демо-записи</div></article>
+        <article class="card metric"><div class="metric-label">На согласовании</div><div class="metric-value" data-count="review">2</div><div class="metric-foot"><span class="tag tag-amber">Требуют решения</span></div></article>
+        <article class="card metric"><div class="metric-label">Утверждено</div><div class="metric-value" data-count="approved">1</div><div class="metric-foot"><span class="tag tag-green">Завершено</span></div></article>
+        <article class="card metric"><div class="metric-label">Черновики</div><div class="metric-value" data-count="draft">1</div><div class="metric-foot">Ожидают отправки</div></article>
+      </section>
+      <section class="card" id="documents">
+        <div class="card-heading"><div><h2>Последние документы</h2><small>Демонстрационный реестр без файлов</small></div><span class="label">Только примеры</span></div>
+        <div class="toolbar" style="padding:14px 15px 0"><label class="sr-only" for="document-search">Найти документ</label><input class="search" id="document-search" type="search" placeholder="Поиск по названию или типу…"><span id="visible-count" class="result-count">4 записи</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Документ</th><th>Тип</th><th>Ответственный</th><th>Обновлён</th><th>Статус</th><th>Действие</th></tr></thead>
+          <tbody id="document-list">
+            <tr data-document data-status="review"><td><strong>Регламент закупок</strong><span class="muted">DOC-2026-041 · v1.2</span></td><td>Внутренний регламент</td><td>Отдел операций</td><td>Сегодня, 10:42</td><td><span class="tag tag-amber">На согласовании</span></td><td><div class="row-actions"><button class="button" data-approve type="button">Утвердить</button><button class="button" data-details type="button">Детали</button></div></td></tr>
+            <tr data-document data-status="review"><td><strong>Порядок доступа к системам</strong><span class="muted">DOC-2026-039 · v2.0</span></td><td>Политика</td><td>ИТ-поддержка</td><td>Вчера, 16:15</td><td><span class="tag tag-amber">На согласовании</span></td><td><div class="row-actions"><button class="button" data-approve type="button">Утвердить</button><button class="button" data-details type="button">Детали</button></div></td></tr>
+            <tr data-document data-status="approved"><td><strong>Шаблон ежемесячного отчёта</strong><span class="muted">DOC-2026-036 · v1.0</span></td><td>Шаблон</td><td>Бизнес-аналитика</td><td>20 ноя, 12:08</td><td><span class="tag tag-green">Утверждён</span></td><td><div class="row-actions"><button class="button" data-details type="button">Детали</button></div></td></tr>
+            <tr data-document data-status="draft"><td><strong>План квартального обзора</strong><span class="muted">DOC-2026-044 · v0.3</span></td><td>Рабочий документ</td><td>Офис программы</td><td>Сегодня, 09:20</td><td><span class="tag">Черновик</span></td><td><div class="row-actions"><button class="button" data-submit type="button">На проверку</button><button class="button" data-details type="button">Детали</button></div></td></tr>
+          </tbody>
+        </table></div>
+      </section>
+    </main>
+    <footer class="frame footer"><span>Clearpath Records · Концепт интерфейса</span><span>Не является системой хранения документов</span></footer>
+    <dialog id="details-dialog" style="max-width:440px;width:calc(100% - 30px);border:1px solid #e1e6ed;border-radius:10px;padding:22px;color:#172033"><h2 id="dialog-title" style="margin:0 0 10px;font-size:17px">Документ</h2><p id="dialog-copy" style="color:#647084;font-size:13px"></p><form method="dialog" style="text-align:right"><button class="button button-primary">Закрыть</button></form></dialog>
+    <script>
+      const list = document.getElementById("document-list");
+      const records = () => [...list.querySelectorAll("[data-document]")];
+      function updateCounts() {
+        for (const status of ["all", "review", "approved", "draft"]) {
+          const count = status === "all" ? records().length : records().filter((row) => row.dataset.status === status).length;
+          document.querySelector(`[data-count="${status}"]`).textContent = count;
+        }
+      }
+      document.getElementById("document-search").addEventListener("input", (event) => {
+        const query = event.target.value.trim().toLocaleLowerCase("ru");
+        let visible = 0;
+        records().forEach((row) => { row.hidden = !row.textContent.toLocaleLowerCase("ru").includes(query); if (!row.hidden) visible += 1; });
+        document.getElementById("visible-count").textContent = `${visible} ${visible === 1 ? "запись" : "записи"}`;
+      });
+      list.addEventListener("click", (event) => {
+        const row = event.target.closest("[data-document]");
+        if (!row) return;
+        if (event.target.matches("[data-approve]")) {
+          row.dataset.status = "approved";
+          row.querySelector(".tag").className = "tag tag-green";
+          row.querySelector(".tag").textContent = "Утверждён (демо)";
+          event.target.parentElement.innerHTML = '<button class="button" data-details type="button">Детали</button>';
+          updateCounts();
+        } else if (event.target.matches("[data-submit]")) {
+          row.dataset.status = "review";
+          row.querySelector(".tag").className = "tag tag-amber";
+          row.querySelector(".tag").textContent = "На согласовании (демо)";
+          event.target.parentElement.innerHTML = '<button class="button" data-approve type="button">Утвердить</button><button class="button" data-details type="button">Детали</button>';
+          updateCounts();
+        } else if (event.target.matches("[data-details]")) {
+          document.getElementById("dialog-title").textContent = row.querySelector("td strong").textContent;
+          document.getElementById("dialog-copy").textContent = `${row.querySelector("td:nth-child(2)").textContent}. Демонстрационная запись: реального файла или процесса согласования нет.`;
+          document.getElementById("details-dialog").showModal();
+        }
+      });
+      document.getElementById("new-record").addEventListener("click", () => window.alert("Демо-концепт: регистрация документа здесь не подключена к хранилищу."));
+      updateCounts();
+    </script>
+  </body>
+</html>
