@@ -19,6 +19,8 @@ The portfolio links to four standalone, responsive product concepts:
 
 Each demo runs without a build step or external runtime dependencies. Sample figures, documents, tasks, and knowledge articles are explicitly labeled as fictional demonstration content; the knowledge search is a local prototype without a hosted AI service.
 
+The standalone **DNA Compute Core** page is published at `/dna-compute/`. Its HTML is copied byte-for-byte from the supplied file; it loads Tailwind CSS from its existing CDN reference.
+
 ## Local preview
 
 Open `index.html` directly in a browser. To test the project links locally, serve the repository root over HTTP so each demo is available under its `/projects/` path.

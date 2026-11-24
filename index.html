@@ -157,6 +157,11 @@
         color: var(--ink); text-decoration: none; transition: border-color .2s ease, transform .2s ease;
       }
       .product-link:hover { transform: translateY(-2px); border-color: var(--acid); }
+      .product-link-featured {
+        display: flex; grid-column: 1 / -1; align-items: center; justify-content: space-between;
+        gap: 24px; border-color: #444c38; background: linear-gradient(110deg, #191d16, #141611);
+      }
+      .product-link-copy { max-width: 720px; }
       .product-link small { color: var(--acid); font: 10px var(--mono); }
       .product-link h3 { margin: 14px 0 6px; font-size: 19px; font-weight: 520; }
       .product-link p { max-width: 470px; margin: 0; color: var(--muted); font-size: 13px; }
@@ -201,6 +206,7 @@
         .principle h3 { margin-top: 20px; }
         .work-grid { grid-template-columns: 1fr; }
         .product-links { grid-template-columns: 1fr; }
+        .product-link-featured { align-items: flex-start; flex-direction: column; }
         .work-card { min-height: 220px; padding: 23px; }
         .stack-layout { gap: 34px; }
         .contact { align-items: flex-start; flex-direction: column; padding: 29px; }
@@ -325,8 +331,8 @@
         <div class="section-heading">
           <div class="section-kicker">03 / Продукты</div>
           <div>
-            <h2>Четыре <span>рабочих демо.</span></h2>
-            <p>Самостоятельные концепты B2B-инструментов с интерактивными сценариями. Данные в примерах вымышлены и помечены на каждом сайте.</p>
+            <h2>Интерактивные <span>проекты.</span></h2>
+            <p>Самостоятельные концепты B2B-инструментов и вычислительный прототип. Демо-данные отмечены внутри каждого продукта.</p>
           </div>
         </div>
         <div class="product-links">
@@ -353,6 +359,14 @@
             <h3>Fieldnote</h3>
             <p>Локальный прототип поиска по базе знаний с ответами и источниками.</p>
             <span>Открыть демо ↗</span>
+          </a>
+          <a class="product-link product-link-featured" href="/dna-compute/">
+            <div class="product-link-copy">
+              <small>COMPUTATIONAL BIOLOGY / VISUAL SIMULATION</small>
+              <h3>DNA Compute Core</h3>
+              <p>Интерактивная визуализация модели ДНК и симуляции вычислительного ядра.</p>
+            </div>
+            <span>Открыть проект ↗</span>
           </a>
         </div>
       </section>

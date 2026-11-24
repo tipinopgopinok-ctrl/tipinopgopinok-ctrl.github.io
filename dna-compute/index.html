@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#05070d">
+    <title>DNA Compute Core</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --sky: #38bdf8;
+            --indigo: #818cf8;
+            --emerald: #34d399;
+            --rose: #fb7185;
+            --amber: #fbbf24;
+            --slate-100: #f1f5f9;
+            --slate-300: #cbd5e1;
+            --slate-400: #94a3b8;
+            --slate-500: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #05070d;
+            color: var(--slate-100);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Inter, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .mono {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        .bg-scene {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(90px);
+            opacity: 0.55;
+            animation: drift 20s ease-in-out infinite alternate;
+        }
+
+        .orb-1 {
+            width: 640px;
+            height: 640px;
+            left: -14%;
+            top: -20%;
+            background: radial-gradient(circle at 30% 30%, rgba(56, 189, 248, 0.48), rgba(14, 165, 233, 0.08) 62%, transparent 72%);
+        }
+
+        .orb-2 {
+            width: 620px;
+            height: 620px;
+            right: -12%;
+            bottom: -18%;
+            background: radial-gradient(circle at 30% 30%, rgba(129, 140, 248, 0.42), rgba(79, 70, 229, 0.08) 62%, transparent 72%);
+            animation-delay: -7s;
+        }
+
+        .orb-3 {
+            width: 420px;
+            height: 420px;
+            left: 38%;
+            top: 58%;
+            background: radial-gradient(circle at 30% 30%, rgba(52, 211, 153, 0.22), rgba(16, 185, 129, 0.05) 62%, transparent 72%);
+            animation-delay: -13s;
+        }
+
+        .grid-lines {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(circle at 50% 38%, black 0%, transparent 78%);
+            opacity: 0.34;
+        }
+
+        .vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 18%, transparent 0%, rgba(2, 6, 23, 0.42) 62%, rgba(2, 6, 23, 0.88) 100%);
+        }
+
+        .app-shell {
+            position: relative;
+            z-index: 10;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 28px 18px 48px;
+        }
+
+        .panel {
+            border-radius: 30px;
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.026) 45%, rgba(15, 23, 42, 0.34));
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            box-shadow:
+                0 24px 70px rgba(0, 0, 0, 0.42),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(26px) saturate(150%);
+            -webkit-backdrop-filter: blur(26px) saturate(150%);
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: 650;
+            color: #e2e8f0;
+            letter-spacing: 0.02em;
+        }
+
+        .micro-label {
+            font-size: 10px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: rgba(148, 163, 184, 0.72);
+        }
+
+        .field-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: rgba(203, 213, 225, 0.82);
+        }
+
+        .field {
+            width: 100%;
+            border-radius: 18px;
+            background: rgba(2, 6, 23, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                0 10px 30px rgba(0, 0, 0, 0.18);
+            padding: 14px 16px;
+            color: #e2e8f0;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+        }
+
+        .field:focus {
+            border-color: rgba(56, 189, 248, 0.55);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                0 0 0 4px rgba(56, 189, 248, 0.12);
+            background: rgba(2, 6, 23, 0.62);
+        }
+
+        .error-text {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #fda4af;
+        }
+
+        .ios-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: 999px;
+            padding: 13px 18px;
+            font-weight: 650;
+            font-size: 14px;
+            letter-spacing: 0.01em;
+            color: rgba(255, 255, 255, 0.92);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                0 10px 30px rgba(0, 0, 0, 0.25);
+            transition:
+                transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1),
+                background 0.2s,
+                box-shadow 0.2s,
+                border-color 0.2s,
+                opacity 0.2s;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .ios-btn:hover {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+            border-color: rgba(255, 255, 255, 0.24);
+        }
+
+        .ios-btn:active {
+            transform: scale(0.97);
+        }
+
+        .ios-btn[disabled] {
+            opacity: 0.42;
+            filter: saturate(0.7);
+            pointer-events: none;
+        }
+
+        .ios-btn-primary {
+            background: linear-gradient(180deg, rgba(56, 189, 248, 0.38), rgba(99, 102, 241, 0.32));
+            border-color: rgba(125, 211, 252, 0.35);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.22),
+                0 14px 38px rgba(14, 165, 233, 0.22);
+        }
+
+        .ios-btn-primary:hover {
+            background: linear-gradient(180deg, rgba(56, 189, 248, 0.46), rgba(99, 102, 241, 0.38));
+            border-color: rgba(125, 211, 252, 0.48);
+        }
+
+        .ios-btn.is-stop {
+            background: linear-gradient(180deg, rgba(244, 63, 94, 0.30), rgba(190, 18, 60, 0.22));
+            border-color: rgba(251, 113, 133, 0.34);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                0 14px 38px rgba(244, 63, 94, 0.18);
+        }
+
+        .ios-btn-small {
+            padding: 9px 13px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .segmented {
+            display: flex;
+            padding: 4px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .segmented button {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            border-radius: 999px;
+            padding: 9px 10px;
+            font-size: 12px;
+            font-weight: 650;
+            color: rgba(255, 255, 255, 0.52);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .segmented button.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.16),
+                0 8px 20px rgba(0, 0, 0, 0.18);
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 30px;
+            background: transparent;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .slider::-webkit-slider-runnable-track {
+            height: 8px;
+            border-radius: 999px;
+            background: linear-gradient(
+                to right,
+                rgba(56, 189, 248, 0.92) var(--p, 50%),
+                rgba(255, 255, 255, 0.08) var(--p, 50%)
+            );
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22);
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            margin-top: -7px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #ffffff, #e2e8f0);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow:
+                0 4px 14px rgba(0, 0, 0, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .slider:active::-webkit-slider-thumb {
+            transform: scale(1.08);
+        }
+
+        .slider::-moz-range-track {
+            height: 8px;
+            border-radius: 999px;
+            background: linear-gradient(
+                to right,
+                rgba(56, 189, 248, 0.92) var(--p, 50%),
+                rgba(255, 255, 255, 0.08) var(--p, 50%)
+            );
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #ffffff, #e2e8f0);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 11px;
+            font-weight: 650;
+            letter-spacing: 0.08em;
+            border: 1px solid;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            white-space: nowrap;
+        }
+
+        .badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: currentColor;
+            box-shadow: 0 0 12px currentColor;
+        }
+
+        .badge-idle {
+            color: #cbd5e1;
+            background: rgba(255, 255, 255, 0.055);
+            border-color: rgba(255, 255, 255, 0.10);
+        }
+
+        .badge-running {
+            color: #bae6fd;
+            background: rgba(14, 165, 233, 0.16);
+            border-color: rgba(56, 189, 248, 0.34);
+            animation: badgePulse 1.2s infinite;
+        }
+
+        .badge-success {
+            color: #a7f3d0;
+            background: rgba(16, 185, 129, 0.16);
+            border-color: rgba(52, 211, 153, 0.32);
+        }
+
+        .badge-error {
+            color: #fecdd3;
+            background: rgba(244, 63, 94, 0.16);
+            border-color: rgba(251, 113, 133, 0.32);
+        }
+
+        .badge-stopped {
+            color: #fde68a;
+            background: rgba(245, 158, 11, 0.14);
+            border-color: rgba(251, 191, 36, 0.28);
+        }
+
+        .canvas-wrap {
+            position: relative;
+            height: 390px;
+            border-radius: 26px;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.08), rgba(2, 6, 23, 0.72) 65%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.06),
+                0 18px 50px rgba(0, 0, 0, 0.28);
+        }
+
+        .canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .scan-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0 3px,
+                rgba(255, 255, 255, 0.018) 3px 4px
+            );
+            mix-blend-mode: overlay;
+            opacity: 0.55;
+        }
+
+        .canvas-hud {
+            position: absolute;
+            top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 10px 12px;
+            border-radius: 18px;
+            background: rgba(2, 6, 23, 0.42);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .canvas-hud.top-left {
+            left: 16px;
+        }
+
+        .canvas-hud.top-right {
+            right: 16px;
+            align-items: flex-end;
+        }
+
+        .hud-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: #e0f2fe;
+        }
+
+        .canvas-bottom {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 20px;
+            background: rgba(2, 6, 23, 0.48);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .progress-shell {
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.07);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
+            transition: width 0.12s linear;
+        }
+
+        .stat {
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            padding: 14px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s, background 0.2s;
+        }
+
+        .stat:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .stat-label {
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(148, 163, 184, 0.75);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 750;
+            color: #f8fafc;
+            line-height: 1.1;
+        }
+
+        .stat-value.sky { color: #7dd3fc; }
+        .stat-value.indigo { color: #a5b4fc; }
+        .stat-value.emerald { color: #6ee7b7; }
+        .stat-value.rose { color: #fda4af; }
+
+        .rank-value {
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            background: linear-gradient(135deg, #7dd3fc, #a5b4fc, #6ee7b7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+        }
+
+        .terminal {
+            background: rgba(2, 6, 23, 0.55);
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 14px;
+            height: 220px;
+            overflow-y: auto;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .terminal::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .terminal::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .terminal::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+        }
+
+        .terminal-line {
+            display: grid;
+            grid-template-columns: 76px 1fr;
+            gap: 10px;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.035);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .terminal-time {
+            color: rgba(100, 116, 139, 0.72);
+        }
+
+        .msg-normal { color: #cbd5e1; }
+        .msg-success { color: #6ee7b7; }
+        .msg-warn { color: #7dd3fc; }
+        .msg-error { color: #fb7185; }
+        .msg-system { color: #a5b4fc; }
+
+        .logo-mark {
+            width: 44px;
+            height: 44px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(145deg, rgba(56, 189, 248, 0.28), rgba(99, 102, 241, 0.18));
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                0 12px 30px rgba(0, 0, 0, 0.24);
+        }
+
+        .icon-orb {
+            width: 38px;
+            height: 38px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(145deg, rgba(56, 189, 248, 0.24), rgba(99, 102, 241, 0.16));
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+        }
+
+        .fade-up {
+            animation: fadeUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+
+        .delay-1 { animation-delay: 0.08s; }
+        .delay-2 { animation-delay: 0.16s; }
+        .delay-3 { animation-delay: 0.24s; }
+
+        .pop {
+            animation: pop 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes drift {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            100% { transform: translate3d(40px, -30px, 0) scale(1.08); }
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.0); }
+            50% { box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.08); }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.86); opacity: 0.35; }
+            60% { transform: scale(1.06); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .app-shell {
+                padding: 20px 14px 36px;
+            }
+
+            .canvas-wrap {
+                height: 300px;
+            }
+
+            .terminal {
+                height: 190px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-scene">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="grid-lines"></div>
+        <div class="vignette"></div>
+    </div>
+
+    <div class="app-shell">
+        <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-7 fade-up">
+            <div class="flex items-center gap-4">
+                <div class="logo-mark">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M7 3C7 3 7 9 12 12C17 15 17 21 17 21" stroke="#7dd3fc" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M17 3C17 3 17 9 12 12C7 15 7 21 7 21" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M8.5 7H15.5" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M8.5 17H15.5" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M10 12H14" stroke="#f472b6" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-sky-300 via-indigo-300 to-emerald-300 bg-clip-text text-transparent">
+                        DNA COMPUTE CORE
+                    </h1>
+                    <p class="text-xs md:text-sm text-slate-400 mt-1 mono">
+                        Biochemical Parallel Processing Simulator
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="badge badge-idle">
+                    <span class="badge-dot"></span>
+                    <span>ONLINE</span>
+                </div>
+                <div class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-slate-300 mono">
+                    <span>CORE TEMP 36.4C</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 xl:grid-cols-[380px_minmax(0, 1fr)] gap-6">
+            <section class="panel p-6 flex flex-col gap-6 fade-up delay-1">
+                <div class="flex items-center justify-between">
+                    <h2 class="panel-title">Управление реакцией</h2>
+                    <span class="micro-label">MODULE A</span>
+                </div>
+
+                <div>
+                    <label for="dnaInput" class="field-label">Цепочка нуклеотидов</label>
+                    <input
+                        type="text"
+                        id="dnaInput"
+                        class="field mono"
+                        value="ATCGGCTATAGC"
+                        spellcheck="false"
+                        autocomplete="off"
+                        placeholder="Например: ATCGGCTA"
+                    >
+                    <p id="inputError" class="error-text hidden"></p>
+
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <button type="button" class="ios-btn ios-btn-small" data-preset="sample">Пример</button>
+                        <button type="button" class="ios-btn ios-btn-small" data-preset="gc">GC богатая</button>
+                        <button type="button" class="ios-btn ios-btn-small" data-preset="random">Случайная</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <label for="enzymeRange" class="field-label mb-0">Концентрация ферментов</label>
+                        <span id="enzymeVal" class="mono text-sm text-sky-300 font-semibold">78</span>
+                    </div>
+                    <input
+                        type="range"
+                        id="enzymeRange"
+                        class="slider"
+                        min="10"
+                        max="100"
+                        value="78"
+                        style="--p: 78%;"
+                    >
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <label for="stabilityRange" class="field-label mb-0">Термическая стабильность</label>
+                        <span id="stabilityVal" class="mono text-sm text-emerald-300 font-semibold">64</span>
+                    </div>
+                    <input
+                        type="range"
+                        id="stabilityRange"
+                        class="slider"
+                        min="20"
+                        max="100"
+                        value="64"
+                        style="--p: 55%;"
+                    >
+                </div>
+
+                <div>
+                    <div class="field-label">Профиль скорости</div>
+                    <div class="segmented" id="speedControl">
+                        <button type="button" data-speed="0.65">Медленно</button>
+                        <button type="button" data-speed="1" class="active">Норма</button>
+                        <button type="button" data-speed="1.65">Быстро</button>
+                    </div>
+                </div>
+
+                <div class="mt-auto flex flex-col gap-3">
+                    <button type="button" id="launchBtn" class="ios-btn ios-btn-primary w-full">
+                        Запустить реакцию
+                    </button>
+                    <button type="button" id="resetBtn" class="ios-btn w-full">
+                        Сбросить систему
+                    </button>
+                </div>
+            </section>
+
+            <section class="flex flex-col gap-6 min-w-0">
+                <div class="panel p-5 fade-up delay-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+                        <div class="flex items-center gap-3">
+                            <div class="icon-orb">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="4" stroke="#7dd3fc" stroke-width="2"/>
+                                    <path d="M12 2V6" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 18V22" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M2 12H6" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M18 12H22" stroke="#f472b6" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="panel-title">Молекулярный визуализатор</div>
+                                <div class="micro-label mt-1">REALTIME DOUBLE HELIX</div>
+                            </div>
+                        </div>
+
+                        <div id="statusBadge" class="badge badge-idle self-start sm:self-auto">
+                            <span class="badge-dot"></span>
+                            <span id="statusText">СИСТЕМА ГОТОВА</span>
+                        </div>
+                    </div>
+
+                    <div class="canvas-wrap">
+                        <canvas id="dnaCanvas"></canvas>
+                        <div class="scan-overlay"></div>
+
+                        <div class="canvas-hud top-left">
+                            <span class="micro-label">Обработано</span>
+                            <span id="processedValue" class="hud-value mono">0 / 12</span>
+                        </div>
+
+                        <div class="canvas-hud top-right">
+                            <span class="micro-label">GC состав</span>
+                            <span id="gcContent" class="hud-value mono">50%</span>
+                        </div>
+
+                        <div class="canvas-bottom">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="micro-label">Прогресс синтеза</span>
+                                <span id="progressValue" class="mono text-xs text-sky-200 font-semibold">0%</span>
+                            </div>
+                            <div class="progress-shell">
+                                <div id="progressFill" class="progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 fade-up delay-3">
+                    <div class="stat">
+                        <div class="stat-label">Параллелизм</div>
+                        <div id="statThreads" class="stat-value sky mono">0.0 млрд</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Точность</div>
+                        <div id="statAccuracy" class="stat-value emerald mono">0.0%</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Энергия</div>
+                        <div id="statEnergy" class="stat-value indigo mono">0.000 мВт</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Очки</div>
+                        <div id="statScore" class="stat-value mono">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Ранг</div>
+                        <div id="statRank" class="rank-value">—</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Мутации</div>
+                        <div id="statMutations" class="stat-value rose mono">0</div>
+                    </div>
+                </div>
+
+                <div class="panel p-5 fade-up delay-3">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <div class="panel-title">Системный журнал</div>
+                            <div class="micro-label mt-1">EVENT STREAM</div>
+                        </div>
+                        <span class="micro-label">TAIL -F</span>
+                    </div>
+                    <div id="terminalLog" class="terminal mono"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const DEFAULT_SEQUENCE = 'ATCGGCTATAGC';
+        const MAX_VISIBLE_LENGTH = 64;
+
+        const COLORS = {
+            A: '#60a5fa',
+            T: '#f472b6',
+            C: '#34d399',
+            G: '#fbbf24'
+        };
+
+        const COMPLEMENT = {
+            A: 'T',
+            T: 'A',
+            C: 'G',
+            G: 'C'
+        };
+
+        const els = {
+            dnaInput: document.getElementById('dnaInput'),
+            inputError: document.getElementById('inputError'),
+            enzymeRange: document.getElementById('enzymeRange'),
+            enzymeVal: document.getElementById('enzymeVal'),
+            stabilityRange: document.getElementById('stabilityRange'),
+            stabilityVal: document.getElementById('stabilityVal'),
+            speedControl: document.getElementById('speedControl'),
+            launchBtn: document.getElementById('launchBtn'),
+            resetBtn: document.getElementById('resetBtn'),
+            statusBadge: document.getElementById('statusBadge'),
+            statusText: document.getElementById('statusText'),
+            canvas: document.getElementById('dnaCanvas'),
+            processedValue: document.getElementById('processedValue'),
+            gcContent: document.getElementById('gcContent'),
+            progressValue: document.getElementById('progressValue'),
+            progressFill: document.getElementById('progressFill'),
+            terminalLog: document.getElementById('terminalLog'),
+            statThreads: document.getElementById('statThreads'),
+            statAccuracy: document.getElementById('statAccuracy'),
+            statEnergy: document.getElementById('statEnergy'),
+            statScore: document.getElementById('statScore'),
+            statRank: document.getElementById('statRank'),
+            statMutations: document.getElementById('statMutations')
+        };
+
+        const ctx = els.canvas.getContext('2d');
+
+        const state = {
+            seq: [],
+            particles: [],
+            stars: [],
+            running: false,
+            progress: 0,
+            startTime: 0,
+            duration: 2000,
+            speed: 1,
+            enzyme: 78,
+            stability: 64,
+            length: 0,
+            gc: 0,
+            mutations: 0,
+            accuracy: 0,
+            energy: 0,
+            threads: 0,
+            score: 0,
+            rank: '—',
+            W: 0,
+            H: 0
+        };
+
+        function clamp(value, min, max) {
+            return Math.min(max, Math.max(min, value));
+        }
+
+        function escapeHtml(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function hexToRgba(hex, alpha) {
+            const clean = hex.replace('#', '');
+            const r = parseInt(clean.substring(0, 2), 16);
+            const g = parseInt(clean.substring(2, 4), 16);
+            const b = parseInt(clean.substring(4, 6), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        function updateSliderFill(input) {
+            const min = Number(input.min);
+            const max = Number(input.max);
+            const value = Number(input.value);
+            const percent = ((value - min) / (max - min)) * 100;
+            input.style.setProperty('--p', percent + '%');
+        }
+
+        function setBadge(text, mode) {
+            els.statusText.textContent = text;
+            els.statusBadge.className = `badge badge-${mode}`;
+        }
+
+        function showError(message) {
+            els.inputError.textContent = message;
+            els.inputError.classList.remove('hidden');
+        }
+
+        function hideError() {
+            els.inputError.textContent = '';
+            els.inputError.classList.add('hidden');
+        }
+
+        function logMessage(text, type = 'normal') {
+            const time = new Date().toLocaleTimeString('ru-RU', { hour12: false });
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = `
+                <span class="terminal-time">${escapeHtml(time)}</span>
+                <span class="msg-${escapeHtml(type)}">${escapeHtml(text)}</span>
+            `;
+            els.terminalLog.appendChild(line);
+
+            while (els.terminalLog.children.length > 90) {
+                els.terminalLog.removeChild(els.terminalLog.firstChild);
+            }
+
+            els.terminalLog.scrollTop = els.terminalLog.scrollHeight;
+        }
+
+        function updateSequenceInfo() {
+            els.processedValue.textContent = `0 / ${state.length || 0}`;
+            els.gcContent.textContent = state.length ? `${state.gc}%` : '—';
+        }
+
+        function cleanSequence(raw) {
+            return String(raw || '').toUpperCase().replace(/[^ATCG]/g, '');
+        }
+
+        function calculateGC(sequence) {
+            if (!sequence.length) return 0;
+            const gcCount = sequence.split('').filter(char => char === 'G' || char === 'C').length;
+            return Math.round((gcCount / sequence.length) * 100);
+        }
+
+        function buildSequence(raw, forSimulation = false) {
+            const clean = cleanSequence(raw);
+
+            if (!clean) {
+                state.seq = [];
+                state.length = 0;
+                state.gc = 0;
+                state.mutations = 0;
+                state.accuracy = 0;
+                updateSequenceInfo();
+                return false;
+            }
+
+            let used = clean;
+
+            if (used.length > MAX_VISIBLE_LENGTH) {
+                used = used.slice(0, MAX_VISIBLE_LENGTH);
+                if (forSimulation) {
+                    logMessage(`Последовательность сокращена до ${MAX_VISIBLE_LENGTH} нуклеотидов для визуализации.`, 'warn');
+                }
+            }
+
+            state.length = used.length;
+            state.gc = calculateGC(used);
+
+            const errorChance = clamp(
+                0.22 - state.enzyme * 0.0014 - state.stability * 0.0009,
+                0.004,
+                0.22
+            );
+
+            state.mutations = 0;
+
+            state.seq = used.split('').map((char, index) => {
+                const mutated = forSimulation ? Math.random() < errorChance : false;
+                if (mutated) state.mutations++;
+
+                return {
+                    char,
+                    comp: COMPLEMENT[char],
+                    processed: false,
+                    justProcessed: false,
+                    glow: 0,
+                    mutated,
+                    index
+                };
+            });
+
+            state.accuracy = forSimulation && state.length
+                ? Math.max(0, (1 - state.mutations / state.length) * 100)
+                : 0;
+
+            updateSequenceInfo();
+            return true;
+        }
+
+        function setSpeed(speed) {
+            state.speed = speed;
+            const buttons = els.speedControl.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.classList.toggle('active', Number(button.dataset.speed) === speed);
+            });
+        }
+
+        function spawnParticle(x, y, color, count = 10) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 0.35 + Math.random() * 1.55;
+                state.particles.push({
+                    x,
+                    y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 0.25,
+                    life: 1,
+                    size: 1.2 + Math.random() * 2.6,
+                    color
+                });
+            }
+        }
+
+        function updateParticles() {
+            for (let i = state.particles.length - 1; i >= 0; i--) {
+                const p = state.particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy -= 0.014;
+                p.vx *= 0.99;
+                p.life -= 0.016;
+
+                if (p.life <= 0) {
+                    state.particles.splice(i, 1);
+                }
+            }
+        }
+
+        function resizeCanvas() {
+            const rect = els.canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            state.W = rect.width;
+            state.H = rect.height;
+
+            els.canvas.width = Math.round(rect.width * dpr);
+            els.canvas.height = Math.round(rect.height * dpr);
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function initStars() {
+            state.stars = Array.from({ length: 62 }, () => ({
+                x: Math.random(),
+                y: Math.random(),
+                r: Math.random() * 1.4 + 0.25,
+                speed: Math.random() * 0.0009 + 0.0002,
+                offset: Math.random() * 100
+            }));
+        }
+
+        function drawAmbient(ts) {
+            for (const star of state.stars) {
+                const alpha = 0.14 + Math.sin(ts * star.speed + star.offset) * 0.10;
+                ctx.beginPath();
+                ctx.arc(star.x * state.W, star.y * state.H, star.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.03, alpha)})`;
+                ctx.fill();
+            }
+        }
+
+        function drawHint() {
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '500 14px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
+            ctx.fillText('Введите последовательность A, T, C, G', state.W / 2, state.H / 2);
+        }
+
+        function drawNode(x, y, color, processed, glow, depth, mutated) {
+            const radius = 5.4 + Math.max(0, depth) * 2.7 + glow * 4.4;
+
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+
+            if (processed) {
+                ctx.fillStyle = color;
+                ctx.shadowColor = mutated ? 'rgba(251, 113, 133, 0.72)' : color;
+                ctx.shadowBlur = 15 + glow * 26;
+            } else {
+                ctx.fillStyle = 'rgba(148, 163, 184, 0.18)';
+                ctx.shadowBlur = 0;
+            }
+
+            ctx.fill();
+
+            ctx.lineWidth = 1.2;
+            ctx.strokeStyle = processed
+                ? 'rgba(255, 255, 255, 0.45)'
+                : 'rgba(255, 255, 255, 0.10)';
+            ctx.stroke();
+
+            if (mutated && processed) {
+                ctx.beginPath();
+                ctx.arc(x, y, radius + 4.5, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(251, 113, 133, 0.55)';
+                ctx.lineWidth = 1.4;
+                ctx.stroke();
+            }
+
+            ctx.shadowBlur = 0;
+        }
+
+        function draw(ts) {
+            ctx.clearRect(0, 0, state.W, state.H);
+            drawAmbient(ts);
+
+            const n = state.seq.length;
+
+            if (!n) {
+                drawHint();
+                return;
+            }
+
+            const padX = Math.max(44, state.W * 0.075);
+            const usableW = Math.max(1, state.W - padX * 2);
+            const step = n > 1 ? usableW / (n - 1) : 0;
+            const centerY = state.H * 0.52;
+            const amp = Math.min(state.H * 0.23, 88);
+            const twist = 0.56;
+            const timePhase = ts * 0.00085;
+
+            const points = [];
+
+            for (let i = 0; i < n; i++) {
+                const x = padX + i * step;
+                const phase = i * twist + timePhase;
+                const y1 = centerY + Math.sin(phase) * amp;
+                const y2 = centerY + Math.sin(phase + Math.PI) * amp;
+                const depth = Math.cos(phase);
+
+                points.push({ x, y1, y2, depth });
+            }
+
+            for (let i = 0; i < n; i++) {
+                const item = state.seq[i];
+
+                if (item.justProcessed) {
+                    const p = points[i];
+                    const color = item.mutated ? '#fb7185' : COLORS[item.char];
+                    spawnParticle(p.x, (p.y1 + p.y2) / 2, color, item.mutated ? 16 : 10);
+                    item.justProcessed = false;
+                }
+
+                if (item.glow > 0) {
+                    item.glow = Math.max(0, item.glow - 0.014);
+                }
+            }
+
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            for (let i = 0; i < n - 1; i++) {
+                const a = points[i];
+                const b = points[i + 1];
+                const lit = state.seq[i].processed && state.seq[i + 1].processed;
+                const alpha = lit ? 0.76 : 0.12;
+
+                ctx.shadowBlur = lit ? 14 : 0;
+                ctx.shadowColor = 'rgba(56, 189, 248, 0.32)';
+
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y1);
+                ctx.lineTo(b.x, b.y1);
+                ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+                ctx.lineWidth = lit ? 4.1 : 2.2;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y2);
+                ctx.lineTo(b.x, b.y2);
+                ctx.strokeStyle = `rgba(129, 140, 248, ${alpha})`;
+                ctx.lineWidth = lit ? 4.1 : 2.2;
+                ctx.stroke();
+
+                ctx.shadowBlur = 0;
+            }
+
+            for (let i = 0; i < n; i++) {
+                const item = state.seq[i];
+                const p = points[i];
+                const col1 = COLORS[item.char];
+                const col2 = COLORS[item.comp];
+                const lit = item.processed;
+
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y1);
+                ctx.lineTo(p.x, p.y2);
+
+                if (lit) {
+                    const grad = ctx.createLinearGradient(p.x, p.y1, p.x, p.y2);
+                    grad.addColorStop(0, col1);
+                    grad.addColorStop(1, col2);
+                    ctx.strokeStyle = grad;
+                    ctx.lineWidth = 4.2;
+                    ctx.shadowColor = item.mutated ? 'rgba(251, 113, 133, 0.62)' : col1;
+                    ctx.shadowBlur = 14 + item.glow * 26;
+                } else {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+                    ctx.lineWidth = 1.8;
+                    ctx.shadowBlur = 0;
+                }
+
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                drawNode(p.x, p.y1, col1, lit, item.glow, p.depth, item.mutated);
+                drawNode(p.x, p.y2, col2, lit, item.glow, -p.depth, item.mutated);
+
+                const labelAlpha = lit ? 0.92 : 0.24;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = '650 11px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+
+                const labelY1 = p.y1 < 30 ? p.y1 + 22 : p.y1 - 19;
+                const labelY2 = p.y2 > state.H - 30 ? p.y2 - 22 : p.y2 + 19;
+
+                ctx.fillStyle = lit
+                    ? hexToRgba(col1, labelAlpha)
+                    : `rgba(148, 163, 184, ${labelAlpha})`;
+                ctx.fillText(item.char, p.x, labelY1);
+
+                ctx.fillStyle = lit
+                    ? hexToRgba(col2, labelAlpha)
+                    : `rgba(148, 163, 184, ${labelAlpha})`;
+                ctx.fillText(item.comp, p.x, labelY2);
+            }
+
+            if (state.running || state.progress > 0) {
+                const scanX = padX + state.progress * (n > 1 ? usableW : 0);
+                const beamWidth = 70;
+
+                const beamGrad = ctx.createLinearGradient(scanX - beamWidth, 0, scanX + beamWidth, 0);
+                beamGrad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+                beamGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.16)');
+                beamGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+
+                ctx.fillStyle = beamGrad;
+                ctx.fillRect(scanX - beamWidth, 0, beamWidth * 2, state.H);
+
+                ctx.beginPath();
+                ctx.moveTo(scanX, 24);
+                ctx.lineTo(scanX, state.H - 24);
+                ctx.strokeStyle = 'rgba(125, 211, 252, 0.28)';
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+            }
+
+            ctx.globalCompositeOperation = 'lighter';
+
+            for (const p of state.particles) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = hexToRgba(p.color, Math.max(0, p.life * 0.72));
+                ctx.fill();
+            }
+
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        function updateProcessed() {
+            const count = Math.floor(state.progress * state.length);
+
+            for (let i = 0; i < count; i++) {
+                const item = state.seq[i];
+                if (!item.processed) {
+                    item.processed = true;
+                    item.glow = 1;
+                    item.justProcessed = true;
+                }
+            }
+        }
+
+        function updateLiveHUD() {
+            const processed = Math.floor(state.progress * state.length);
+            const percent = Math.round(state.progress * 100);
+
+            els.progressFill.style.width = `${state.progress * 100}%`;
+            els.progressValue.textContent = `${percent}%`;
+            els.processedValue.textContent = `${processed} / ${state.length}`;
+
+            let liveMutations = 0;
+            for (let i = 0; i < processed; i++) {
+                if (state.seq[i].mutated) liveMutations++;
+            }
+
+            const liveAccuracy = processed > 0
+                ? ((processed - liveMutations) / processed) * 100
+                : 0;
+
+            const liveThreads = (processed * state.enzyme * 0.16 / state.speed).toFixed(1);
+            const enzymeBonus = 0.78 + state.enzyme / 145;
+            const stabilityBonus = 0.86 + state.stability / 260;
+            const liveScore = Math.round(processed * liveAccuracy * enzymeBonus * stabilityBonus);
+
+            els.statThreads.textContent = `${liveThreads} млрд`;
+            els.statAccuracy.textContent = `${liveAccuracy.toFixed(1)}%`;
+            els.statMutations.textContent = String(liveMutations);
+            els.statScore.textContent = String(liveScore);
+        }
+
+        function getRank(score) {
+            if (score >= 6200) return 'S';
+            if (score >= 4800) return 'A';
+            if (score >= 3400) return 'B';
+            if (score >= 2100) return 'C';
+            return 'D';
+        }
+
+        function animateNumber(element, end, decimals = 0, suffix = '', duration = 750) {
+            const start = parseFloat(String(element.textContent).replace(/[^0-9.-]/g, '')) || 0;
+            const startTime = performance.now();
+
+            function step(now) {
+                const p = Math.min(1, (now - startTime) / duration);
+                const eased = 1 - Math.pow(1 - p, 3);
+                const value = start + (end - start) * eased;
+                element.textContent = value.toFixed(decimals) + suffix;
+
+                if (p < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+
+            requestAnimationFrame(step);
+        }
+
+        function finishSimulation() {
+            state.running = false;
+            state.progress = 1;
+
+            els.launchBtn.textContent = 'Запустить реакцию';
+            els.launchBtn.classList.remove('is-stop');
+
+            setBadge('СИНТЕЗ ЗАВЕРШЁН', 'success');
+
+            const enzymeBonus = 0.78 + state.enzyme / 145;
+            const stabilityBonus = 0.86 + state.stability / 260;
+
+            state.score = Math.round(state.length * state.accuracy * enzymeBonus * stabilityBonus);
+            state.rank = getRank(state.score);
+            state.energy = Number((
+                0.014 +
+                state.length * 0.0019 +
+                state.enzyme * 0.00026 +
+                state.mutations * 0.0065
+            ).toFixed(3));
+            state.threads = Number((state.length * state.enzyme * 0.16 / state.speed).toFixed(1));
+
+            animateNumber(els.statThreads, state.threads, 1, ' млрд');
+            animateNumber(els.statAccuracy, state.accuracy, 1, '%');
+            animateNumber(els.statEnergy, state.energy, 3, ' мВт');
+            animateNumber(els.statScore, state.score, 0, '');
+            els.statMutations.textContent = String(state.mutations);
+
+            els.statRank.textContent = state.rank;
+            els.statRank.classList.remove('pop');
+            void els.statRank.offsetWidth;
+            els.statRank.classList.add('pop');
+
+            logMessage(`Реакция завершена. Точность ${state.accuracy.toFixed(1)}%, мутации ${state.mutations}.`, 'success');
+            logMessage(`Итоговый ранг: ${state.rank}. Очки синтеза: ${state.score}.`, 'system');
+        }
+
+        function startSimulation() {
+            const raw = els.dnaInput.value;
+
+            if (!buildSequence(raw, true)) {
+                showError('Нужно ввести хотя бы один нуклеотид: A, T, C или G.');
+                setBadge('ОЖИДАНИЕ ВВОДА', 'error');
+                logMessage('Пустая последовательность. Реакция не запущена.', 'error');
+                return;
+            }
+
+            hideError();
+
+            state.running = true;
+            state.progress = 0;
+            state.particles = [];
+            state.startTime = performance.now();
+
+            const baseDuration = 850 + state.length * 42;
+            const enzymeFactor = 1.28 - state.enzyme / 240;
+            state.duration = clamp(baseDuration * enzymeFactor / state.speed, 650, 4200);
+
+            setBadge('СИНТЕЗ АКТИВЕН', 'running');
+            els.launchBtn.textContent = 'Остановить реакцию';
+            els.launchBtn.classList.add('is-stop');
+
+            logMessage(`Инициализация реакции: ${state.length} пар, фермент ${state.enzyme}%, стабильность ${state.stability}%.`, 'system');
+
+            if (state.mutations > 0) {
+                logMessage(`Прогноз нестабильности: возможно ${state.mutations} мутационных событий.`, 'warn');
+            } else {
+                logMessage('Прогноз чистого синтеза: мутации не обнаружены.', 'success');
+            }
+        }
+
+        function stopSimulation() {
+            if (!state.running) return;
+
+            state.running = false;
+            state.progress = 0;
+            state.particles = [];
+
+            state.seq.forEach(item => {
+                item.processed = false;
+                item.justProcessed = false;
+                item.glow = 0;
+            });
+
+            els.launchBtn.textContent = 'Запустить реакцию';
+            els.launchBtn.classList.remove('is-stop');
+
+            setBadge('РЕАКЦИЯ ОСТАНОВЛЕНА', 'stopped');
+            logMessage('Реакция остановлена оператором.', 'warn');
+
+            els.progressFill.style.width = '0%';
+            els.progressValue.textContent = '0%';
+            els.processedValue.textContent = `0 / ${state.length}`;
+            els.statThreads.textContent = '0.0 млрд';
+            els.statAccuracy.textContent = '0.0%';
+            els.statEnergy.textContent = '0.000 мВт';
+            els.statScore.textContent = '0';
+            els.statMutations.textContent = '0';
+            els.statRank.textContent = '—';
+        }
+
+        function resetSimulation() {
+            state.running = false;
+            state.progress = 0;
+            state.particles = [];
+            state.score = 0;
+            state.rank = '—';
+            state.energy = 0;
+            state.threads = 0;
+            state.accuracy = 0;
+            state.mutations = 0;
+
+            els.dnaInput.value = DEFAULT_SEQUENCE;
+            buildSequence(DEFAULT_SEQUENCE, false);
+
+            els.launchBtn.textContent = 'Запустить реакцию';
+            els.launchBtn.classList.remove('is-stop');
+
+            setBadge('СИСТЕМА ГОТОВА', 'idle');
+
+            els.progressFill.style.width = '0%';
+            els.progressValue.textContent = '0%';
+            els.statThreads.textContent = '0.0 млрд';
+            els.statAccuracy.textContent = '0.0%';
+            els.statEnergy.textContent = '0.000 мВт';
+            els.statScore.textContent = '0';
+            els.statMutations.textContent = '0';
+            els.statRank.textContent = '—';
+
+            hideError();
+            logMessage('Система сброшена к базовому состоянию.', 'system');
+        }
+
+        function generateRandomSequence() {
+            const bases = 'ATCG';
+            const length = 18 + Math.floor(Math.random() * 14);
+            let result = '';
+
+            for (let i = 0; i < length; i++) {
+                result += bases[Math.floor(Math.random() * bases.length)];
+            }
+
+            return result;
+        }
+
+        function bindEvents() {
+            els.enzymeRange.addEventListener('input', event => {
+                state.enzyme = Number(event.target.value);
+                els.enzymeVal.textContent = state.enzyme;
+                updateSliderFill(event.target);
+            });
+
+            els.stabilityRange.addEventListener('input', event => {
+                state.stability = Number(event.target.value);
+                els.stabilityVal.textContent = state.stability;
+                updateSliderFill(event.target);
+            });
+
+            els.dnaInput.addEventListener('input', () => {
+                hideError();
+                if (!state.running) {
+                    buildSequence(els.dnaInput.value, false);
+                }
+            });
+
+            els.dnaInput.addEventListener('keydown', event => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    if (!state.running) {
+                        startSimulation();
+                    }
+                }
+            });
+
+            els.launchBtn.addEventListener('click', () => {
+                if (state.running) {
+                    stopSimulation();
+                } else {
+                    startSimulation();
+                }
+            });
+
+            els.resetBtn.addEventListener('click', resetSimulation);
+
+            els.speedControl.addEventListener('click', event => {
+                const button = event.target.closest('button[data-speed]');
+                if (!button) return;
+                setSpeed(Number(button.dataset.speed));
+                logMessage(`Профиль скорости изменён: ${button.textContent}.`, 'system');
+            });
+
+            document.querySelectorAll('[data-preset]').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (state.running) return;
+
+                    const preset = button.dataset.preset;
+                    let value = DEFAULT_SEQUENCE;
+
+                    if (preset === 'sample') {
+                        value = 'ATCGGCTATAGC';
+                    } else if (preset === 'gc') {
+                        value = 'GGCCATGCCGATGGCCTA';
+                    } else if (preset === 'random') {
+                        value = generateRandomSequence();
+                    }
+
+                    els.dnaInput.value = value;
+                    buildSequence(value, false);
+                    hideError();
+                    logMessage(`Загружен пресет: ${button.textContent}.`, 'system');
+                });
+            });
+
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        function loop(ts) {
+            if (state.running) {
+                const elapsed = ts - state.startTime;
+                state.progress = Math.min(1, elapsed / state.duration);
+
+                updateProcessed();
+                updateLiveHUD();
+
+                if (state.progress >= 1) {
+                    finishSimulation();
+                }
+            }
+
+            updateParticles();
+            draw(ts);
+            requestAnimationFrame(loop);
+        }
+
+        function init() {
+            resizeCanvas();
+            initStars();
+            updateSliderFill(els.enzymeRange);
+            updateSliderFill(els.stabilityRange);
+            setSpeed(1);
+            buildSequence(DEFAULT_SEQUENCE, false);
+            bindEvents();
+
+            logMessage('Ядро визуализации загружено.', 'system');
+            logMessage('Двуспиральный рендер активен.', 'normal');
+            logMessage('Ожидание запуска биохимической реакции.', 'normal');
+
+            requestAnimationFrame(loop);
+        }
+
+        init();
+    </script>
+</body>
+</html>
